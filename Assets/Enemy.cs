@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
+using UnityEngine.Events;
 
 [RequireComponent (typeof (Rigidbody2D))]
 [RequireComponent (typeof (Seeker))]
 public class Enemy : MonoBehaviour {
 
+	public CharacterController2D controller;
+
 	public Transform target;
-	
+	private bool m_FacingRight = true;
 	// How many times each second we will update our path
 	public float updateRate = 2f;
 	
@@ -25,6 +28,7 @@ public class Enemy : MonoBehaviour {
 	[HideInInspector]
 	public bool pathIsEnded = false;
 	
+
 	
 	//The max distance from the AI to a waypoint for it to continue to the next waypoint
 	public float nextWaypointDistance = 3;
@@ -38,7 +42,7 @@ public class Enemy : MonoBehaviour {
 		
 		
 		//Start a new path to the target position, return the result to the OnPathComplete method
-		seeker.StartPath(transform.position, target.position, OnPathComplete);
+		//seeker.StartPath(transform.position, transform.position, OnPathComplete);
 			
 		StartCoroutine(UpdatePath());
 			
@@ -65,6 +69,7 @@ public class Enemy : MonoBehaviour {
 
 	void FixedUpdate()
 	{
+
 		if(target == null)
 			return;
 		
@@ -85,7 +90,7 @@ public class Enemy : MonoBehaviour {
 		//Direction to the next way point
 		Vector3 dir = (path.vectorPath[currentWayPoint] - transform.position).normalized;
 		dir *= speed * Time.fixedDeltaTime;
-		
+
 		//Move the AI
 		rb.AddForce(dir, fMode);
 		
@@ -94,5 +99,9 @@ public class Enemy : MonoBehaviour {
 			currentWayPoint++;
 			return;
 		}
+		
+
 	}
+
+
 }
