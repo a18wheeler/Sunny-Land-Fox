@@ -11,9 +11,16 @@ public class PlayerMovement : MonoBehaviour {
     
     public float runSpeed = 40f;
 
+    public GameObject GameOverText, RestartButton;
+
     bool jump = false;
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    private void Start()
+    {
+        GameOverText.SetActive(false);
+        RestartButton.SetActive(false);
+    }
+    void Update () {
 
        horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
 
@@ -37,5 +44,16 @@ public class PlayerMovement : MonoBehaviour {
         controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump);
 
         jump = false;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag.Equals("enemy"))
+        {
+            GameOverText.SetActive(true);
+            RestartButton.SetActive(true);
+            gameObject.SetActive(false);
+
+        }
     }
 }
