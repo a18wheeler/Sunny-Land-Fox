@@ -8,10 +8,8 @@ using UnityEngine.Events;
 [RequireComponent (typeof (Seeker))]
 public class Enemy : MonoBehaviour {
 
-	public CharacterController2D controller;
 
 	public Transform target;
-	private bool m_FacingRight = true;
 	// How many times each second we will update our path
 	public float updateRate = 2f;
 	

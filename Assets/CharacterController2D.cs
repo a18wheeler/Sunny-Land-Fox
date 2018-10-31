@@ -23,13 +23,15 @@ public class CharacterController2D : MonoBehaviour
 	[Space]
 
 	public UnityEvent OnLandEvent;
+	
 
 	[System.Serializable]
 	public class BoolEvent : UnityEvent<bool> { }
-
+    public BoolEvent OnAttackEvent;
 	public BoolEvent OnCrouchEvent;
 	private bool m_wasCrouching = false;
-
+    private bool m_wasAttacking = false;
+	
 	private void Awake()
 	{
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
@@ -39,6 +41,9 @@ public class CharacterController2D : MonoBehaviour
 
 		if (OnCrouchEvent == null)
 			OnCrouchEvent = new BoolEvent();
+		
+		if (OnAttackEvent == null)
+			OnAttackEvent = new BoolEvent();
 	}
 
 	private void FixedUpdate()
@@ -61,8 +66,11 @@ public class CharacterController2D : MonoBehaviour
 	}
 
 
-	public void Move(float move, bool crouch, bool jump)
+	public void Move(float move, bool crouch, bool jump, bool attack)
 	{
+
+		
+
 		// If crouching, check to see if the character can stand up
 		if (!crouch)
 		{
@@ -72,11 +80,29 @@ public class CharacterController2D : MonoBehaviour
 				crouch = true;
 			}
 		}
+		
 
 		//only control the player if grounded or airControl is turned on
 		if (m_Grounded || m_AirControl)
 		{
-
+			if(attack)
+			{	
+				move = 0;
+				if(!m_wasAttacking)
+				{
+					m_wasAttacking = true;
+					OnAttackEvent.Invoke(true);
+				}
+			}
+			else
+			{
+				if(m_wasAttacking)
+				{
+					m_wasAttacking = false;
+					OnAttackEvent.Invoke(false);
+				}
+			}
+			
 			// If crouching
 			if (crouch)
 			{
@@ -130,6 +156,9 @@ public class CharacterController2D : MonoBehaviour
 			m_Grounded = false;
 			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
 		}
+	
+		
+		
 	}
 
 
