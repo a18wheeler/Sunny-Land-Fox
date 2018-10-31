@@ -6,6 +6,7 @@ public class EnemyFollow : MonoBehaviour {
 
 
     public float speed;
+    public int curHealth;
 
     private bool m_FacingLeft = true;  // For determining which way the player is currently facing.
 
@@ -19,6 +20,10 @@ public class EnemyFollow : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (curHealth <= 0)
+        {
+            Destroy(gameObject);
+        }
 
         if ((transform.position.x - target.position.x) < 0 && m_FacingLeft)
         {
@@ -45,5 +50,11 @@ public class EnemyFollow : MonoBehaviour {
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
+    }
+
+    public void Damage(int damage)
+    {
+        curHealth -= damage;
+        //gameObject.GetComponent<Animation>().
     }
 }
