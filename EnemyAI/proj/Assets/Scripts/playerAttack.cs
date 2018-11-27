@@ -10,6 +10,7 @@ public class playerAttack : MonoBehaviour {
     private float attackCd = 0.4f;
 
     public Collider2D attackTrigger;
+    public Collider2D dAir;
 
     private Animator anim;
 
@@ -17,11 +18,19 @@ public class playerAttack : MonoBehaviour {
     {
         anim = gameObject.GetComponent<Animator>();
         attackTrigger.enabled = false;
+        dAir.enabled = false;
     }
 
     private void Update()
     {
-        if(Input.GetKeyDown("z") && !attacking)
+        if (Input.GetKeyDown("z") && !attacking && Input.GetKey(KeyCode.DownArrow))
+        {
+            attacking = true;
+            attackTimer = attackCd;
+
+            dAir.enabled = true;
+        }
+        else if (Input.GetKeyDown("z") && !attacking)
         {
             attacking = true;
             attackTimer = attackCd;
@@ -40,6 +49,7 @@ public class playerAttack : MonoBehaviour {
             {
                 attacking = false;
                 attackTrigger.enabled = false;
+                dAir.enabled = false;
             }
         }
         anim.SetBool("Attacking", attacking);

@@ -2,36 +2,42 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EagleBehavior : MonoBehaviour {
+public class FrogBehaviour : MonoBehaviour {
 
-
-    public float speed;
     public int curHealth;
+    public Rigidbody2D rb2d;
+    private Animator anim;
+    private float m_JumpForce = 600f;
+    private float jumpCD = 2.0f;
+    private float jumpTimer = 0f;
+    private bool isJumping;
+    private bool isLanding;
+    private bool landed;
 
     private bool m_FacingLeft = true;  // For determining which way the player is currently facing.
 
     private Transform target;
     private Vector2 goal;
     public int targetHP;
-    public float range = 2;
-    private float hoverPos;
-
-    private bool isFlee = false;
-    private float isAttack = 0;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         //player becomes target
+        isJumping = false;
+        isLanding = false;
+        landed = false;
         target = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
-        
-        hoverPos = target.position.y + 2;
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        anim = gameObject.GetComponent<Animator>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         Perceive();
 
         Execute();
+
     }
 
     private void Flip()
@@ -51,16 +57,9 @@ public class EagleBehavior : MonoBehaviour {
         //gameObject.GetComponent<Animation>().
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag.Equals("Player"))
-        {
-            isFlee = true;
-        }
-    }
-
     public void Perceive()
     {
+
         if (curHealth <= 0)
         {
             Destroy(gameObject);
@@ -68,7 +67,27 @@ public class EagleBehavior : MonoBehaviour {
 
         targetHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHurt>().currHealth;
 
-        hoverPos = target.position.y + 2;
+        if (rb2d.velocity.y < 0)
+        {
+            isJumping = false;
+            isLanding = true;
+        }
+        else if (rb2d.velocity.y == 0)
+        {
+            isLanding = false;
+            landed = true;
+        }
+
+        if (landed)
+        {
+            if (jumpTimer > 0)
+            {
+                jumpTimer -= Time.deltaTime;
+            }
+        }
+        anim.SetBool("isJumping", isJumping);
+
+        anim.SetBool("isLanding", isLanding);
 
         if ((transform.position.x - goal.x) < 0 && m_FacingLeft)
         {
@@ -81,36 +100,18 @@ public class EagleBehavior : MonoBehaviour {
             // ... flip the character.
             Flip();
         }
+
+
     }
 
     public int Think()
     {
-        System.Random rng = new System.Random();
-
-        int r = (rng.Next(0,200*(targetHP)));
-
-        if(r == 8)
+        if (!isJumping && jumpTimer <= 1)
         {
-            isAttack = 10000*Time.deltaTime;
-        }
-
-        if (isFlee)
-        {
-            isAttack = 0;
-            goal = -target.position;
-            return 2;
-        }
-        else if(isAttack > 0)
-        {
-            isAttack--;
             goal = target.position;
             return 1;
         }
-        else
-        {
-            isAttack = 0;
-            return 3;
-        }
+        return 3;
     }
 
     public void Execute()
@@ -125,47 +126,40 @@ public class EagleBehavior : MonoBehaviour {
                 Flee();
                 break;
             case 3:
-                Stalk();
+                Idle();
                 break;
             default:
-                Attack();
+                Idle();
                 break;
         }
     }
+    public void Idle()
+    {
 
+    }
     public void Attack()
     {
-        transform.position = Vector2.MoveTowards(transform.position, goal, speed * Time.deltaTime);
+        float x = goal.x - transform.position.x;
+        float y = m_JumpForce;
+        Jump(x, y);
     }
 
-    public void Stalk()
-    {
-       
-        if (transform.position.x == goal.x)
-        {
-            range = range * -1;
-        }
-        
-        goal = new Vector2(
-        target.position.x - range,
-        hoverPos
-     );
-        transform.position = Vector2.MoveTowards(transform.position, goal, speed * Time.deltaTime); 
-    }
-    
     public void Flee()
     {
-        if (transform.position.y > hoverPos)
-        {
-            goal = target.position;
-            isFlee = false;
-        }
 
-        else
-        {
-         
-            transform.position = Vector2.MoveTowards(transform.position, goal, speed * Time.deltaTime);
-        }
+    }
+
+    public void Jump(float x, float y)
+    {
+        landed = false;
+        isJumping = true;
+        jumpTimer = jumpCD;
+        rb2d.AddForce(new Vector2(x*50, y));
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
 
     }
 }
+
