@@ -65,8 +65,10 @@ public class EagleBehavior : MonoBehaviour {
         {
             Destroy(gameObject);
         }
-
-        targetHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHurt>().currHealth;
+        if (GameObject.FindGameObjectWithTag("Player") != null)
+        {
+            targetHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHurt>().currHealth;
+        }
 
         hoverPos = target.position.y + 2;
 
@@ -91,7 +93,7 @@ public class EagleBehavior : MonoBehaviour {
 
         if(r == 8)
         {
-            isAttack = 10000*Time.deltaTime;
+            isAttack = 2;
         }
 
         if (isFlee)
@@ -102,7 +104,7 @@ public class EagleBehavior : MonoBehaviour {
         }
         else if(isAttack > 0)
         {
-            isAttack--;
+            isAttack-=Time.deltaTime;
             goal = target.position;
             return 1;
         }
@@ -162,8 +164,7 @@ public class EagleBehavior : MonoBehaviour {
         }
 
         else
-        {
-         
+        {         
             transform.position = Vector2.MoveTowards(transform.position, goal, speed * Time.deltaTime);
         }
 

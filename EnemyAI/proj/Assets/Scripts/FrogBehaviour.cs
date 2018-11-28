@@ -29,6 +29,7 @@ public class FrogBehaviour : MonoBehaviour {
         landed = false;
         target = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
         anim = gameObject.GetComponent<Animator>();
+        rb2d.freezeRotation = true;
     }
 
     // Update is called once per frame
@@ -65,7 +66,10 @@ public class FrogBehaviour : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        targetHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHurt>().currHealth;
+        if (GameObject.FindGameObjectWithTag("Player") != null)
+        {
+            targetHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHurt>().currHealth;
+        }
 
         if (rb2d.velocity.y < 0)
         {
