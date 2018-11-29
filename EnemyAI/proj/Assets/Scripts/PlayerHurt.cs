@@ -26,9 +26,19 @@ public class PlayerHurt : MonoBehaviour {
         if (invulnTimer > 0)
         {
             invulnTimer -= Time.deltaTime;
+
+            gameObject.GetComponent<SpriteRenderer>().enabled = false;
+            gameObject.layer = 8;
+
         }
+        else
+        {
+            gameObject.GetComponent<SpriteRenderer>().enabled = true;
+            gameObject.layer = 1;
+        }
+
     }
-    //if hit by enemy 
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
 
@@ -45,5 +55,5 @@ public class PlayerHurt : MonoBehaviour {
         RestartButton.SetActive(true);
         gameObject.SetActive(false);
     }
-
+    
 }
